@@ -81,7 +81,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
-            <version>2.0.16</version> <!-- For testing purposes -->
+            <scope>provided</scope> <!-- For testing purposes -->
         </dependency>
         <dependency>
             <groupId>jakarta.validation</groupId>
@@ -97,6 +97,10 @@
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
             <version>2.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 	</dependencies>
 

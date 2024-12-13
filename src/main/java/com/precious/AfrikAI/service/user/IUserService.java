@@ -3,6 +3,9 @@ package com.precious.AfrikAI.service.user;
 import com.precious.AfrikAI.dto.UserRegistrationDto;
 import com.precious.AfrikAI.model.User;
 import com.precious.AfrikAI.model.UserRole;
+
+import java.util.List;
+
 import org.springframework.security.core.userdetails.UserDetails;
 
 public interface IUserService {
@@ -13,6 +16,7 @@ public interface IUserService {
     User getUserById(Long id);
     User updateUser(Long userId, User userDetails);
     void deleteUser(Long userId);
+    List<User> getAllUsers();
 
     // Role Management
     void changeUserRole(Long userId, UserRole newRole);

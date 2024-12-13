@@ -15,13 +15,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.EnumType;
 import com.precious.AfrikAI.model.UserRole;
 
-@Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 @Table(name = "users")
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -38,22 +39,31 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
-    private double wallet = 0.0;  // For tracking user earnings/balance
+    private double wallet = 0.0;
 
-    // New enabled attribute
     @Column(nullable = false)
-    private boolean enabled = true;  // Default to true when user is created
+    private boolean enabled = true;
 
     @Column(nullable = false)
     private LocalDateTime registeredAt = LocalDateTime.now();
 
-    // Optional: Method to check if account is enabled
+    // Custom constructor for user creation (without auto-generated fields)
+    public User(String username, String email, String password, UserRole role) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
+
+    public void setEnabled() {
+        this.enabled = false;
+    }
+    
     public boolean isEnabled() {
         return this.enabled;
     }
 
-    // Optional: Method to disable/enable account
-    public void setAccountEnabled(boolean enabled) {
-        this.enabled = enabled;
+    public UserRole getRole() {
+        return this.role;
     }
 }

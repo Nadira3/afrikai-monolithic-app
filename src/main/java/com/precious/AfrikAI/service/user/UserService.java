@@ -10,6 +10,9 @@ import com.precious.AfrikAI.service.user.IUserService;
 import com.precious.AfrikAI.model.User;
 import com.precious.AfrikAI.model.UserRole;
 import com.precious.AfrikAI.exception.*;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +63,11 @@ public class UserService implements IUserService {
     public User getUserById(Long userId) {
         return userRepository.findById(userId)
             .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 
     @Override
