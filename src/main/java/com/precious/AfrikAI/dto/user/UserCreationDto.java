@@ -1,18 +1,19 @@
-package com.precious.AfrikAI.dto;
+package com.precious.AfrikAI.dto.user;
 
-import com.precious.AfrikAI.model.UserRole;
+import com.precious.AfrikAI.model.user.UserRole;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-// User Registration DTO
+// User Creation DTO
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserRegistrationDto {
+public class UserCreationDto {
     @NotBlank(message = "Username is required")
     private String username;
 

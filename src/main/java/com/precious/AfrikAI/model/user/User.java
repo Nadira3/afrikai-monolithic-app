@@ -1,4 +1,4 @@
-package com.precious.AfrikAI.model;
+package com.precious.AfrikAI.model.user;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,12 +8,18 @@ import lombok.AllArgsConstructor;
 import jakarta.persistence.Table;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Enumerated;
 import java.time.LocalDateTime;
+import java.util.List;
+
+import com.precious.AfrikAI.model.task.Task;
+
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.EnumType;
-import com.precious.AfrikAI.model.UserRole;
+
 
 @Getter
 @Setter
@@ -38,6 +44,14 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private UserRole role;
+
+    // Define the relationship for tasks associated with this user
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Task> tasksAsClient;
+
+    @OneToMany(mappedBy = "assignedTasker")
+    private List<Task> tasksAsAssignedTasker;
+
 
     private double wallet = 0.0;
 

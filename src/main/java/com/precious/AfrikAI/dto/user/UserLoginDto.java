@@ -1,4 +1,4 @@
-package com.precious.AfrikAI.dto;
+package com.precious.AfrikAI.dto.user;
 
 import lombok.Data;
 import jakarta.validation.constraints.NotBlank;

@@ -1,0 +1,55 @@
+flowchart TD
+    %% User Interaction Start
+    A[User Registration/Login] --> |UserDTO| B{User Role Assignment}
+    B --> |Client| ClientFlow
+    B --> |Tasker| TaskerFlow
+    B --> |Admin| AdminFlow
+
+    %% Client Flow
+    subgraph ClientFlow[Client User Flow]
+        C1[Create Task Request] --> |TaskRequestDTO| C2[Submit to Task Repository]
+        C2 --> C3[Service Processes Task Request]
+        C3 --> C4[Available Tasks List]
+        C4 --> C5[Assign Task to Taskers]
+    end
+
+    %% Tasker Flow
+    subgraph TaskerFlow[Tasker User Flow]
+        D1[View Available Tasks] --> |TaskDTO| D2[Accept Task]
+        D2 --> D3[Perform Task]
+        D3 --> D4[Submit Task Completion]
+        D4 --> |TaskSubmissionDTO| D5[Service Validates Submission]
+        D5 --> D6[Client Reviews Submission]
+        D6 --> |Approval/Rejection| D7[Payment Processing]
+    end
+
+    %% Admin Flow
+    subgraph AdminFlow[Admin User Flow]
+        E1[User Management] --> E2[View/Edit User Roles]
+        E2 --> E3[Monitor Platform Activities]
+        E3 --> E4[Task Oversight]
+        E4 --> E5[Payment and Billing Management]
+    end
+
+    %% Payment and Completion Flow
+    D7 --> F1[Payment Gateway Integration]
+    F1 --> F2[Transfer Funds]
+    F2 --> F3[Update User Wallets]
+    F3 --> F4[Archive Completed Task]
+    F4 --> F5[Delete Expired/Completed Tasks]
+
+    %% Security Layer Interaction
+    A --> G[Spring Security Layer]
+    G --> |Authentication & Authorization| H[Role-Based Access Control]
+    H --> |Validate Permissions| I[Service Layer Validation]
+
+    %% Database Interactions
+    C2 --> J[Database Repository]
+    D5 --> J
+    E1 --> J
+    F4 --> J
+
+    %% Error Handling
+    J --> |Potential Errors| K[Exception Handling Layer]
+    K --> L[Logging and Notification]
+  

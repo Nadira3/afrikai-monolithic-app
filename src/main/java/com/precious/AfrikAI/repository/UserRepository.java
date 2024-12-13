@@ -1,8 +1,10 @@
 package com.precious.AfrikAI.repository;
 
 import org.springframework.stereotype.Repository;
-import com.precious.AfrikAI.model.User;
-import com.precious.AfrikAI.model.UserRole;
+
+import com.precious.AfrikAI.model.user.User;
+import com.precious.AfrikAI.model.user.UserRole;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;

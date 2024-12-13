@@ -3,7 +3,8 @@ package com.precious.AfrikAI.security.custom;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import com.precious.AfrikAI.model.User;
+
+import com.precious.AfrikAI.model.user.User;
 
 import java.util.Collection;
 import java.util.Collections;

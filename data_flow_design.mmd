@@ -1,0 +1,31 @@
+flowchart TD
+    A[Client Uploads Data File] --> B{File Validation}
+    B -->|Valid| C[Create Data Import Record]
+    B -->|Invalid| D[Reject Import]
+    
+    C --> E[Parse File into Prompt-Response Pairs]
+    E --> F[Create Prompt-Response Pair Entities]
+    F --> G[Queue Pairs for Allocation]
+    
+    G --> H[Find Available Taskers]
+    H --> I[Randomly Allocate Pairs to Taskers]
+    I --> J[Create Allocation Records]
+    
+    J --> K{Tasker Accepts Task}
+    K -->|Yes| L[Begin Labeling Process]
+    K -->|No| M[Reallocate to Another Tasker]
+    
+    L --> N[Complete Labeling]
+    N --> O{Labeling Quality Check}
+    O -->|Passes| P[Mark as Completed]
+    O -->|Fails| Q[Request Revision/Reallocation]
+    
+    P --> R[Update Task Status]
+    R --> S[Notify Client of Completion]
+    
+    M --> I
+    Q --> I
+    
+    style A fill:#f9f,stroke:#333,stroke-width:4px
+    style S fill:#bbf,stroke:#333,stroke-width:4px
+    style D fill:#ffcccc,stroke:#333,stroke-width:4px

@@ -1,17 +1,19 @@
 package com.precious.AfrikAI.controller;
 
-import com.precious.AfrikAI.dto.UserRegistrationDto;
-import com.precious.AfrikAI.model.User;
-import com.precious.AfrikAI.model.UserRole;
+import com.precious.AfrikAI.dto.user.UserCreationDto;
+import com.precious.AfrikAI.dto.user.UserRegistrationDto;
+import com.precious.AfrikAI.exception.*;
+import com.precious.AfrikAI.model.user.User;
+import com.precious.AfrikAI.model.user.UserRole;
 import com.precious.AfrikAI.service.user.UserService;
 
 import jakarta.validation.Valid;
-
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,32 +43,64 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> registerUser(
+    public ResponseEntity<?> registerUser(
         @Valid @RequestBody UserRegistrationDto registrationDto
     ) {
-        User registeredUser = userService.registerNewUser(registrationDto);
-        return ResponseEntity.ok(registeredUser);
+        try {
+            User registeredUser = userService.registerNewUser(registrationDto);
+            return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
+        } catch (UserAlreadyExistsException | IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/admin/create")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<User> createUser(
+        @RequestBody UserCreationDto creationDto
+    ) {
+        try {
+            User createdUser = userService.createUser(creationDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+        } catch (UserAlreadyExistsException | IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<User> getUserById(@PathVariable Long userId) {
-        User user = userService.getUserById(userId);
-        return ResponseEntity.ok(user);
+    public ResponseEntity<?> getUserById(@PathVariable Long userId) {
+        try {
+            User user = userService.getUserById(userId);
+            return new ResponseEntity<>(user, HttpStatus.OK);
+            
+        } catch (UserNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 
+    
     @PutMapping("/{userId}")
-    public ResponseEntity<User> updateUser(
-        @PathVariable Long userId, 
+    public ResponseEntity<?> updateUser(
+        @PathVariable Long userId,
         @RequestBody User userDetails
     ) {
+    try {
         User updatedUser = userService.updateUser(userId, userDetails);
-        return ResponseEntity.ok(updatedUser);
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+    } catch (UserNotFoundException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
+}
+
 
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
-        userService.deleteUser(userId);
-        return ResponseEntity.noContent().build();
+        try {
+            userService.deleteUser(userId);
+            return ResponseEntity.noContent().build();
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PatchMapping("/{userId}/role")
@@ -74,8 +108,12 @@ public class UserController {
         @PathVariable Long userId, 
         @RequestParam UserRole newRole
     ) {
-        userService.changeUserRole(userId, newRole);
-        return ResponseEntity.ok().build();
+        try {
+            userService.changeUserRole(userId, newRole);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException | UserNotFoundException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PostMapping("/{userId}/wallet/add")
@@ -83,8 +121,12 @@ public class UserController {
         @PathVariable Long userId, 
         @RequestParam double amount
     ) {
-        userService.addFundsToWallet(userId, amount);
-        return ResponseEntity.ok().build();
+        try {
+            userService.addFundsToWallet(userId, amount);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException | UserNotFoundException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PostMapping("/{userId}/wallet/withdraw")
@@ -92,7 +134,11 @@ public class UserController {
         @PathVariable Long userId, 
         @RequestParam double amount
     ) {
-        userService.withdrawFundsFromWallet(userId, amount);
-        return ResponseEntity.ok().build();
+        try {
+            userService.withdrawFundsFromWallet(userId, amount);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException | UserNotFoundException | InsufficientFundsException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

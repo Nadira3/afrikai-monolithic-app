@@ -1,15 +1,16 @@
 package com.precious.AfrikAI.service.user;
 
 import org.springframework.stereotype.Service;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.precious.AfrikAI.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import com.precious.AfrikAI.dto.UserRegistrationDto;
-import com.precious.AfrikAI.service.user.IUserService;
-import com.precious.AfrikAI.model.User;
-import com.precious.AfrikAI.model.UserRole;
+
+import com.precious.AfrikAI.dto.user.UserCreationDto;
+import com.precious.AfrikAI.dto.user.UserRegistrationDto;
 import com.precious.AfrikAI.exception.*;
+import com.precious.AfrikAI.model.user.User;
+import com.precious.AfrikAI.model.user.UserRole;
 
 import java.util.List;
 
@@ -45,6 +46,11 @@ public class UserService implements IUserService {
             throw new UserAlreadyExistsException("Username is already in use");
         }
 
+        // Validate role
+        if (!UserRole.exists(registrationDto.getRole().name())) {
+            throw new IllegalArgumentException("Invalid role: " + registrationDto.getRole());
+        }
+
         // Create new user
         User newUser = new User();
         newUser.setUsername(registrationDto.getUsername());
@@ -60,6 +66,22 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public User createUser(UserCreationDto creationDto) {
+        // Create user with specified role
+        if (!UserRole.exists(creationDto.getRole().name())) {
+            throw new IllegalArgumentException("Invalid role: " + creationDto.getRole());
+        }
+
+        User newUser = new User();
+        newUser.setUsername(creationDto.getUsername());
+        newUser.setEmail(creationDto.getEmail());
+        newUser.setPassword(passwordEncoder.encode(creationDto.getPassword()));
+        newUser.setRole(creationDto.getRole());
+
+        return userRepository.save(newUser);
+    }
+
+    @Override
     public User getUserById(Long userId) {
         return userRepository.findById(userId)
             .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
@@ -70,54 +92,84 @@ public class UserService implements IUserService {
         return userRepository.findAll();
     }
 
-    @Override
-    public User updateUser(Long userId, User userDetails) {
-        User existingUser = getUserById(userId);
-        
-        // Update allowed fields
-        existingUser.setUsername(userDetails.getUsername());
-        
-        logger.info("User updated: {}", existingUser.getUsername());
-        return userRepository.save(existingUser);
+    public User updateUser(Long userId, User updatedUser) {
+        return userRepository.findById(userId)
+            .map(existingUser -> {
+                existingUser.setUsername(updatedUser.getUsername());
+                existingUser.setEmail(updatedUser.getEmail());
+                existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword())); // Hash the password
+                existingUser.setRole(updatedUser.getRole()); // Update roles if needed
+                return userRepository.save(existingUser);
+            })
+            .orElseThrow(() -> new UserNotFoundException("User with ID " + userId + " not found"));
     }
-
+    
     @Override
     public void deleteUser(Long userId) {
-        User userToDelete = getUserById(userId);
-        userRepository.delete(userToDelete);
-        logger.info("User deleted: {}", userId);
+        try {
+            User userToDelete = getUserById(userId);
+            userRepository.delete(userToDelete);
+        } catch (Exception e) {
+            throw new UserNotFoundException("User not found with ID: " + userId);
+        }
+        logger.info("User with id: {} deleted", userId);
     }
 
     @Override
     public void changeUserRole(Long userId, UserRole newRole) {
-        User user = getUserById(userId);
-        user.setRole(newRole);
-        userRepository.save(user);
-        logger.info("User role changed: {} to {}", user.getUsername(), newRole);
+        try {
+            if (!UserRole.exists(newRole.name())) {
+                throw new IllegalArgumentException("Invalid role: " + newRole);
+            }
+            User user = getUserById(userId);
+            user.setRole(newRole);
+            userRepository.save(user);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid role: " + newRole);
+        } catch (Exception e) {
+            throw new UserNotFoundException("User not found with ID: " + userId);
+        }
+        logger.info("User with Id: {} role changed to {}", userId, newRole);
     }
 
     // Wallet methods
     @Override
     public void addFundsToWallet(Long userId, double amount) {
-        User user = getUserById(userId);
-        if (amount > 0) {
+        try {
+            if (amount < 0) {
+                throw new IllegalArgumentException("Amount must be positive");
+            }
+            User user = getUserById(userId);
             user.setWallet(user.getWallet() + amount);
             userRepository.save(user);
             logger.info("Added funds to user wallet: {} amount: {}", userId, amount);
-        } else {
+        } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Amount must be positive");
+        } catch (Exception e) {
+            throw new UserNotFoundException("User not found with ID: " + userId);
         }
     }
 
     @Override
     public void withdrawFundsFromWallet(Long userId, double amount) {
-        User user = getUserById(userId);
-        if (amount > 0 && user.getWallet() >= amount) {
-            user.setWallet(user.getWallet() - amount);
-            userRepository.save(user);
-            logger.info("Withdrawn funds from user wallet: {} amount: {}", userId, amount);
-        } else {
+        try {
+            if (amount < 0) {
+                throw new IllegalArgumentException("Amount must be positive");
+            }
+            User user = getUserById(userId);
+            if (amount > 0 && user.getWallet() >= amount) {
+                user.setWallet(user.getWallet() - amount);
+                userRepository.save(user);
+                logger.info("Withdrawn funds from user wallet: {} amount: {}", userId, amount);
+            } else {
+                throw new InsufficientFundsException("Insufficient funds or invalid amount");
+            }
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Amount must be positive");
+        } catch (InsufficientFundsException e) {
             throw new InsufficientFundsException("Insufficient funds or invalid amount");
+        } catch (Exception e) {
+            throw new UserNotFoundException("User not found with ID: " + userId);
         }
     }
 }

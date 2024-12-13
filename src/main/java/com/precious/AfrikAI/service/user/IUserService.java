@@ -1,16 +1,18 @@
 package com.precious.AfrikAI.service.user;
 
-import com.precious.AfrikAI.dto.UserRegistrationDto;
-import com.precious.AfrikAI.model.User;
-import com.precious.AfrikAI.model.UserRole;
+import com.precious.AfrikAI.dto.user.UserCreationDto;
+import com.precious.AfrikAI.dto.user.UserRegistrationDto;
+import com.precious.AfrikAI.model.user.User;
+import com.precious.AfrikAI.model.user.UserRole;
 
 import java.util.List;
-
-import org.springframework.security.core.userdetails.UserDetails;
 
 public interface IUserService {
     // User Registration
     User registerNewUser(UserRegistrationDto registrationDto);
+
+    // User Creation
+    User createUser(UserCreationDto creationDto);
 
     // User Management
     User getUserById(Long id);
