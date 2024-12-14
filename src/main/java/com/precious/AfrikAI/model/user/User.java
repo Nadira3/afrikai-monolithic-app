@@ -13,6 +13,8 @@ import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.DiscriminatorType;
 import jakarta.persistence.Enumerated;
 import java.time.LocalDateTime;
+import java.util.UUID;
+
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
@@ -30,8 +32,8 @@ import jakarta.persistence.EnumType;
 public abstract class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id; 
 
     @Column(unique = true, nullable = false)
     private String username;
