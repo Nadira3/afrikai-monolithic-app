@@ -8,16 +8,14 @@ import lombok.AllArgsConstructor;
 import jakarta.persistence.Table;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorColumn;
+import jakarta.persistence.DiscriminatorType;
 import jakarta.persistence.Enumerated;
 import java.time.LocalDateTime;
-import java.util.List;
-
-import com.precious.AfrikAI.model.task.Task;
-
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
 import jakarta.persistence.EnumType;
 
 
@@ -27,7 +25,9 @@ import jakarta.persistence.EnumType;
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
-public class User {
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "user_type", discriminatorType = DiscriminatorType.STRING)
+public abstract class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,16 +43,10 @@ public class User {
     private String password;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private UserRole role;
 
-    // Define the relationship for tasks associated with this user
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Task> tasksAsClient;
-
-    @OneToMany(mappedBy = "assignedTasker")
-    private List<Task> tasksAsAssignedTasker;
-
-
+    @Column(nullable = false)
     private double wallet = 0.0;
 
     @Column(nullable = false)
@@ -61,7 +55,7 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime registeredAt = LocalDateTime.now();
 
-    // Custom constructor for user creation (without auto-generated fields)
+    // Custom constructor for user creation
     public User(String username, String email, String password, UserRole role) {
         this.username = username;
         this.email = email;
@@ -69,15 +63,11 @@ public class User {
         this.role = role;
     }
 
-    public void setEnabled() {
+    public void disableUser() {
         this.enabled = false;
     }
-    
+
     public boolean isEnabled() {
         return this.enabled;
-    }
-
-    public UserRole getRole() {
-        return this.role;
     }
 }

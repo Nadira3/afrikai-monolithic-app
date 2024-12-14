@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
@@ -17,7 +16,6 @@ import jakarta.validation.Valid;
 import com.precious.AfrikAI.dto.task.TaskCreationDto;
 import com.precious.AfrikAI.model.task.Task;
 import com.precious.AfrikAI.model.user.User;
-import com.precious.AfrikAI.repository.UserRepository;
 import com.precious.AfrikAI.security.custom.CustomUserDetails;
 import com.precious.AfrikAI.service.task.TaskService;
 import com.precious.AfrikAI.service.user.UserService;
