@@ -1,14 +1,11 @@
 package com.precious.AfrikAI.model.task;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
+
 
 import com.precious.AfrikAI.model.user.Client;
 import com.precious.AfrikAI.model.user.Tasker;
-import com.precious.AfrikAI.model.user.User;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,6 +26,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import com.precious.AfrikAI.model.data.Submission;
 
 @Entity
 @Getter
@@ -39,7 +37,7 @@ import lombok.Setter;
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id; 
+    private Long id; 
 
     @Column(name = "title", nullable = false)
     private String title;
@@ -60,7 +58,7 @@ public class Task {
     private TaskStatus status;
 
     @Column(name = "reward", nullable = false)
-    private BigDecimal reward;
+    private Double reward;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -76,7 +74,7 @@ public class Task {
     private TaskCategory category;
 
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
-    private List<Object> submissions;
+    private List<Submission> submissions;
 
     @Column(name = "task_quality")
     private Double taskQuality;

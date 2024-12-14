@@ -14,6 +14,7 @@ import com.precious.AfrikAI.dto.task.TaskCreationDto;
 import com.precious.AfrikAI.model.task.Task;
 import com.precious.AfrikAI.model.task.TaskCategory;
 import com.precious.AfrikAI.model.task.TaskStatus;
+import com.precious.AfrikAI.model.user.Client;
 import com.precious.AfrikAI.model.user.User;
 import com.precious.AfrikAI.repository.TaskRepository;
 import com.precious.AfrikAI.repository.UserRepository;
@@ -32,7 +33,7 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public Task createTask(User client, TaskCreationDto taskDto) {
+    public Task createTask(Client client, TaskCreationDto taskDto) {
         Task newTask = new Task();
         newTask.setTitle(taskDto.getTitle());
         newTask.setDescription(taskDto.getDescription());

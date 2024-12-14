@@ -9,6 +9,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.precious.AfrikAI.dto.user.UserCreationDto;
 import com.precious.AfrikAI.dto.user.UserRegistrationDto;
 import com.precious.AfrikAI.exception.*;
+import com.precious.AfrikAI.model.user.Admin;
+import com.precious.AfrikAI.model.user.Client;
+import com.precious.AfrikAI.model.user.Tasker;
 import com.precious.AfrikAI.model.user.User;
 import com.precious.AfrikAI.model.user.UserRole;
 
@@ -34,7 +37,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User registerNewUser(UserRegistrationDto registrationDto) {
+    public User registerUser(UserRegistrationDto registrationDto) {
         // Validate unique email and username
         if (userRepository.existsByEmail(registrationDto.getEmail())) {
             logger.warn("Attempted registration with existing email: {}", registrationDto.getEmail());
@@ -46,23 +49,19 @@ public class UserService implements IUserService {
             throw new UserAlreadyExistsException("Username is already in use");
         }
 
-        // Validate role
-        if (!UserRole.exists(registrationDto.getRole().name())) {
-            throw new IllegalArgumentException("Invalid role: " + registrationDto.getRole());
-        }
-
         // Create new user
-        User newUser = new User();
-        newUser.setUsername(registrationDto.getUsername());
-        newUser.setEmail(registrationDto.getEmail());
-        newUser.setPassword(passwordEncoder.encode(registrationDto.getPassword()));
-        newUser.setRole(registrationDto.getRole());
+        User newUser = createUserByRole(
+            registrationDto.getUsername(),
+            registrationDto.getEmail(),
+            registrationDto.getPassword(),
+            registrationDto.getRole()
+            );
         
         // Save and log
         User savedUser = userRepository.save(newUser);
         logger.info("New user registered: {} with role {}", savedUser.getUsername(), savedUser.getRole());
         
-        return savedUser;
+        return userRepository.save(newUser);
     }
 
     @Override
@@ -72,13 +71,47 @@ public class UserService implements IUserService {
             throw new IllegalArgumentException("Invalid role: " + creationDto.getRole());
         }
 
-        User newUser = new User();
-        newUser.setUsername(creationDto.getUsername());
-        newUser.setEmail(creationDto.getEmail());
-        newUser.setPassword(passwordEncoder.encode(creationDto.getPassword()));
-        newUser.setRole(creationDto.getRole());
+        User newUser = createUserByRole(
+            creationDto.getUsername(),
+            creationDto.getEmail(),
+            creationDto.getPassword(),
+            creationDto.getRole()
+            );   
 
         return userRepository.save(newUser);
+    }
+
+    
+    public User createUserByRole(String username, String email, String password, UserRole role) {
+        // Create user with specified role
+
+        // Check if role is valid
+        if (!UserRole.exists(role.name())) {
+            throw new IllegalArgumentException("Invalid role: " + role);
+        }
+
+        User newUser;
+        
+        // Instantiate the user based on the role
+        switch (role) {
+            case CLIENT:
+                newUser = new Client();
+                break;
+            case TASKER:
+                newUser = new Tasker();
+                break;
+            case ADMIN:
+                newUser = new Admin(); // Admin will have no special attributes
+                break;
+            default:   // Should never reach here
+                throw new IllegalArgumentException("Invalid role: " + role);
+        }
+        newUser.setUsername(username);
+        newUser.setEmail(email);
+        newUser.setPassword(passwordEncoder.encode(password));
+        newUser.setRole(role);
+
+        return newUser;
     }
 
     @Override

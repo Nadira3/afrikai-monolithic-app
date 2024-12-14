@@ -5,11 +5,12 @@ import java.util.List;
 import com.precious.AfrikAI.dto.task.TaskCreationDto;
 import com.precious.AfrikAI.model.task.Task;
 import com.precious.AfrikAI.model.task.TaskCategory;
+import com.precious.AfrikAI.model.user.Client;
 import com.precious.AfrikAI.model.user.User;
 
 public interface ITaskService {
     // Task Creation
-    Task createTask(User client, TaskCreationDto taskDto);
+    Task createTask(Client client, TaskCreationDto taskDto);
 
     // Task Discovery
     List<Task> findAvailableTasks();

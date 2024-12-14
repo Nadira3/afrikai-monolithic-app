@@ -47,7 +47,7 @@ public class UserController {
         @Valid @RequestBody UserRegistrationDto registrationDto
     ) {
         try {
-            User registeredUser = userService.registerNewUser(registrationDto);
+            User registeredUser = userService.registerUser(registrationDto);
             return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
         } catch (UserAlreadyExistsException | IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

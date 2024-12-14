@@ -9,12 +9,14 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import jakarta.validation.Valid;
 
 import com.precious.AfrikAI.dto.task.TaskCreationDto;
 import com.precious.AfrikAI.model.task.Task;
+import com.precious.AfrikAI.model.user.Client;
 import com.precious.AfrikAI.model.user.User;
 import com.precious.AfrikAI.security.custom.CustomUserDetails;
 import com.precious.AfrikAI.service.task.TaskService;
@@ -31,12 +33,13 @@ public class TaskController {
         this.userService = userService;
     }
 
+    @PreAuthorize("hasRole('CLIENT')")
     @PostMapping("/create")
     public ResponseEntity<Task> createTask(
         @AuthenticationPrincipal CustomUserDetails userDetails, 
         @Valid @RequestBody TaskCreationDto taskDto
     ) {
-        User client = userDetails.getUser();
+        Client client = (Client) userDetails.getUser();
         Task createdTask = taskService.createTask(client, taskDto);
         return ResponseEntity.ok(createdTask);
     }

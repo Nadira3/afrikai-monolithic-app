@@ -9,10 +9,11 @@ import java.util.List;
 
 public interface IUserService {
     // User Registration
-    User registerNewUser(UserRegistrationDto registrationDto);
+    User registerUser(UserRegistrationDto registrationDto);
 
     // User Creation
     User createUser(UserCreationDto creationDto);
+    User createUserByRole(String username, String email, String password, UserRole role);
 
     // User Management
     User getUserById(Long id);
