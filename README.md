@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is the initial version of a monolithic application that I developed as part of a personal project. The application aimed to provide a fully functional system to manage various user-related tasks, including user authentication, task management, and service integrations. It was designed as a single monolithic codebase before transitioning to a more modular microservices-based architecture.
+This is the initial version of a monolithic application that I developed as part of my final project. The application aimed to provide a fully functional system to manage various user-related tasks, including user authentication, task management, and service integrations. It was designed as a single monolithic codebase before transitioning to a more modular microservices-based architecture.
 
 ## Features
 
